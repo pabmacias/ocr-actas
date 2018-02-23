@@ -19,6 +19,10 @@ app = Flask(__name__)
 CORS(app)
 Compress(app)
 
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "OCR-NDS-588a394cb12f.json"
+
+client = vision.ImageAnnotatorClient()
+
 natural_language_understanding = NaturalLanguageUnderstandingV1(
     version='2017-02-27',
     username='016622a0-6952-42ac-82fa-61a43ec6b6ca',
@@ -353,7 +357,7 @@ def nl_detect(tx, look, catRight, catWrong):
         print(tx)
 
 def get_text_from_files(path, look, catRight, catWrong):
-    client = vision.ImageAnnotatorClient()
+    #client = vision.ImageAnnotatorClient()
 
     #bounds = []
 
