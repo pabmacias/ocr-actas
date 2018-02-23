@@ -90,8 +90,7 @@ def upload_file():
             look=['agriculture and forestry', 'food industry', 'food and drink', 'food processors']
         if (mainCat == 'constructora'):
             look=['construction', 'remodeling and construction', 'home improvement and repair', 'interior decorating',
-                    'gardening and landscaping', 'home furnishings', 'home improvement and repair', 'real estate',
-                    'finance']
+                    'gardening and landscaping', 'home furnishings', 'home improvement and repair', 'real estate']
 
         catRight=[]
         catWrong=[]
