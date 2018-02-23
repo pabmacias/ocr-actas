@@ -118,8 +118,8 @@ def upload_file():
 
         if (len(sortedCatRight) > 0):
             if (sortedCatRight[0].av >= 1):
-                return render_template('actaResults.html', cat1=sortedcatRight[0], cat2=sortedcatRight[1], cat3=sortedcatRight[2],
-                    cat4=sortedcatRight[3], cat5=sortedcatRight[4], alert=False, name=mainCat)
+                return render_template('actaResults.html', cat1=sortedCatRight[0], cat2=sortedCatRight[1], cat3=sortedCatRight[2],
+                    cat4=sortedCatRight[3], cat5=sortedCatRight[4], alert=False, name=mainCat)
             else:
                 return render_template('actaResults.html', cat1=sortedCatWrong[0], cat2=sortedCatWrong[1], cat3=sortedCatWrong[2],
                     cat4=sortedCatWrong[3], cat5=sortedCatWrong[4], alert=True, name=mainCat)
