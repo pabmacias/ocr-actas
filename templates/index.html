@@ -5,9 +5,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="robots" content="noindex, follow">
-    <title>Tonos con Twitter</title>
-    <meta name="keywords" content="por qué predix, comunidad predix, predix y la industria, nearshore delivery solutions">
-    <meta name="description" content="Predix ayuda a desarrollar, implementar y operar aplicaciones indusrtiales en sitio y en la nube.">
+    <title>Acta Constitutiva OCR</title>
+    <meta name="keywords" content="ocr, actas, ibm cloud, nearshore delivery solutions, google cloud">
+    <meta name="description" content="OCR para leer actas constitutivas en pdf.">
     <meta name="viewport" content="width=device-width, maximum-scale=1, initial-scale=1, user-scalable=0">
     <!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'><![endif]-->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400%7CRaleway:300,400,500,600,700%7CLato:300,400,400italic,600,700" rel="stylesheet" type="text/css">
@@ -17,14 +17,11 @@
     <link href="static/css/essentials.css" rel="stylesheet" type="text/css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
     <!-- Custom -->
-    <link rel="stylesheet" href="static/plugins/owl-carousel/owl-carousel/owl.carousel.css">
-    <link rel="stylesheet" href="static/plugins/owl-carousel2/assets/owl.carousel.css">
-    <link href="static/css/thermometer.css" rel="stylesheet" type="text/css">
+
     <link href="static/css/essentials.css" rel="stylesheet" type="text/css">
     <link href="static/css/layout.css" rel="stylesheet" type="text/css">
     <link href="static/css/header-1.css" rel="stylesheet" type="text/css">
     <link href="static/css/color_scheme/pink.css" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="thermometer.css">
     <link rel="icon" type="image/png" href="static/images/favicon/favicon.png">
 </head>
 <body class="smoothscroll enable-animation">
@@ -68,12 +65,12 @@
                         <div class="container text-center">
 
                             <h1 class="m-0 wow fadeInUp" data-wow-delay="0.4s">
-                                Análisis de tono y audiencia usando Watson y Data Mining
+                                OCR de Acta Constitutiva
                             </h1>
                           </br>
                             <p class="lead font-lato fs-30 wow fadeInUp" data-wow-delay="0.7s">
-                                Utilizamos Instagram y Twitter combinado con Watson para hacer
-                                un análisis detallado de tu audiencia
+                                Usando natural language understanding de IBM y vision de google cloud, podemos saber
+                                la función de una empresa según su acta constitutiva
                                 <span class="theme-color fw-400 font-style-italic"></span>
                             </p>
 
@@ -93,10 +90,13 @@
         <div class="col-md-12 text-center">
           <form action = "{{ url_for('upload_file') }}" method = "POST"
              enctype = "multipart/form-data">
-             <input type="radio" name="mainCat" value="technology and computing"> Tecnología
+             <label>Primero selecciona la categoria que mas refleje los resultados que esperas</label>
+
+             <input type="radio" name="mainCat" value="tecnologia"> Tecnología
              <input type="radio" name="mainCat" value="alimentos"> Alimentos
              <input type="radio" name="mainCat" value="constructora"> Constructora
              <br><br>
+             <label>Selecciona tu acta, el archivo debe ser pdf</label>
              <input type = "file" name = "file" />
              <input type = "submit"/>
           </form>

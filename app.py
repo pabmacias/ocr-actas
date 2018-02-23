@@ -84,17 +84,19 @@ def upload_file():
         #print(f.filename)
 
         mainCat = request.form['mainCat']
-        if (mainCat == 'technology and computing'):
+        if (mainCat == 'tecnologia'):
             look=['technology and computing', 'computer science']
         if (mainCat == 'alimentos'):
             look=['agriculture and forestry', 'food industry', 'food and drink', 'food processors']
         if (mainCat == 'constructora'):
             look=['construction', 'remodeling and construction', 'home improvement and repair', 'interior decorating',
                     'gardening and landscaping', 'home furnishings', 'home improvement and repair', 'real estate',
-                    'personal finance']
+                    'finance']
 
         catRight=[]
         catWrong=[]
+
+        alert = False
 
         images = convert_from_path(secure_filename(f.filename))
         os.system("rm " + secure_filename(f.filename))
@@ -114,6 +116,16 @@ def upload_file():
         for c in sortedCatWrong:
             c.sortText()
 
+        if (len(sortedCatRight) > 0):
+            if (sortedCatRight[0].av >= 1):
+                return render_template('actaResults.html', cat1=sortedcatRight[0], cat2=sortedcatRight[1], cat3=sortedcatRight[2],
+                    cat4=sortedcatRight[3], cat5=sortedcatRight[4], alert=False, name=mainCat)
+            else:
+                return render_template('actaResults.html', cat1=sortedCatWrong[0], cat2=sortedCatWrong[1], cat3=sortedCatWrong[2],
+                    cat4=sortedCatWrong[3], cat5=sortedCatWrong[4], alert=True, name=mainCat)
+        else:
+            return render_template('actaResults.html', cat1=sortedCatWrong[0], cat2=sortedCatWrong[1], cat3=sortedCatWrong[2],
+                cat4=sortedCatWrong[3], cat5=sortedCatWrong[4], alert=True, name=mainCat)
         #for c in sortedCon:
         #    c.sortText()
         return render_template('actaResults.html', cat1=sortedCatWrong[0], cat2=sortedCatWrong[1], cat3=sortedCatWrong[2],
@@ -137,8 +149,8 @@ def nl_detect(tx, look, catRight, catWrong):
                 la = c['label'].split("/")
 
                 if (la[1] != 'law, govt and politics' and la[1] != 'society' and la[1] != 'government'
-                        and la[1] != 'hobbies and interests'
-                  and la[1] != 'legal issues' and tx != "A DOS"):
+                  and la[1] != 'hobbies and interests' and la[1] != 'legal issues' and tx != 'A DOS'
+                  and la[1] != 'travel'):
                     for lo in look:
                         if (right):
                             break
