@@ -6,6 +6,9 @@ import io
 from werkzeug import secure_filename
 from pdf2image import convert_from_path, convert_from_bytes
 from wand.image import Image
+import requests
+import json
+from json import JSONEncoder
 
 from watson_developer_cloud import NaturalLanguageUnderstandingV1
 from watson_developer_cloud.natural_language_understanding_v1 import Features, CategoriesOptions, KeywordsOptions, ConceptsOptions, RelationsOptions, EntitiesOptions
@@ -27,6 +30,10 @@ natural_language_understanding = NaturalLanguageUnderstandingV1(
     version='2017-02-27',
     username='016622a0-6952-42ac-82fa-61a43ec6b6ca',
     password='X35haiEXqzTS')
+
+class MyEncoder(JSONEncoder):
+        def default(self, o):
+            return o.__dict__
 
 class Category:
     def __init__(self, av, name, tx):
@@ -78,57 +85,80 @@ def Index():
 
 @app.route('/acta', methods=['POST'])
 def upload_file():
-    if request.method == 'POST':
-        f = request.files['file']
-        f.save(secure_filename(f.filename))
-        #print(f.filename)
+    #print(request.json)
+    #url='http://bpm.nearshoremx.com/sysNDS/es/neoclassic/cases/cases_ShowDocument?a=9555767175a905da86a5c71075418462&v=1'
+    url = request.json.get("url")
+    #print (url)
+    local_filename = "acta.pdf"
+    r = requests.get(url, stream=True)
+    with open(local_filename, 'wb') as f:
+        for chunk in r.iter_content(chunk_size=1024):
+            if chunk: # filter out keep-alive new chunks
+                f.write(chunk)
+                #f.flush() commented by recommendation from J.F.Sebastian
+    #return local_filename
 
-        mainCat = request.form['mainCat']
-        if (mainCat == 'tecnologia'):
-            look=['technology and computing', 'computer science']
-        if (mainCat == 'alimentos'):
-            look=['agriculture and forestry', 'food industry', 'food and drink', 'food processors']
-        if (mainCat == 'constructora'):
-            look=['construction', 'remodeling and construction', 'home improvement and repair', 'interior decorating',
+    #print(f.filename)
+
+    mainCat = 'tecnologia'
+
+    #mainCat = request.form['mainCat']
+    if (mainCat == 'tecnologia'):
+        look=['technology and computing', 'computer science']
+    if (mainCat == 'alimentos'):
+        look=['agriculture and forestry', 'food industry', 'food and drink', 'food processors']
+    if (mainCat == 'constructora'):
+        look=['construction', 'remodeling and construction', 'home improvement and repair', 'interior decorating',
                     'gardening and landscaping', 'home furnishings', 'home improvement and repair', 'real estate']
 
-        catRight=[]
-        catWrong=[]
 
-        alert = False
+    catRight=[]
+    catWrong=[]
 
-        images = convert_from_path(secure_filename(f.filename))
-        os.system("rm " + secure_filename(f.filename))
+    alert = False
 
-        for image in images:
-            get_text_from_files(image, look, catRight, catWrong)
+    images = convert_from_path(local_filename)
+#    os.system("rm " + local_filename)
 
-        sortedCatRight = sorted(catRight, key=lambda c: c.av, reverse=True)
-        sortedCatWrong = sorted(catWrong, key=lambda c: c.av, reverse=True)
-#        sortedCon = sorted(con, key=lambda c: c.av, reverse=True)
+    for image in images:
+        get_text_from_files(image, look, catRight, catWrong)
+
+    sortedCatRight = sorted(catRight, key=lambda c: c.av, reverse=True)
+    sortedCatWrong = sorted(catWrong, key=lambda c: c.av, reverse=True)
+#       sortedCon = sorted(con, key=lambda c: c.av, reverse=True)
 #        sortedEnt = sorted(ent, key=lambda c: c.av, reverse=True)
 #        sortedKey = sorted(key, key=lambda c: c.av, reverse=True)
 
-        for c in sortedCatRight:
-            c.sortText()
+    print(sortedCatRight)
 
-        for c in sortedCatWrong:
-            c.sortText()
+    for c in sortedCatRight:
+        c.sortText()
 
-        if (len(sortedCatRight) > 0):
-            if (sortedCatRight[0].av >= 1):
-                return render_template('actaResults.html', cat1=sortedCatRight[0], cat2=sortedCatRight[1], cat3=sortedCatRight[2],
-                    cat4=sortedCatRight[3], cat5=sortedCatRight[4], alert=False, name=mainCat)
-            else:
-                return render_template('actaResults.html', cat1=sortedCatWrong[0], cat2=sortedCatWrong[1], cat3=sortedCatWrong[2],
-                    cat4=sortedCatWrong[3], cat5=sortedCatWrong[4], alert=True, name=mainCat)
+    for c in sortedCatWrong:
+        c.sortText()
+
+    print (json.dumps(MyEncoder().encode(sortedCatRight)))
+
+    if (len(sortedCatRight) > 0):
+        if (sortedCatRight[0].av >= 1):
+            return jsonify({
+                'code': 'SUCCESS',
+                'cat': MyEncoder().encode(sortedCatRight),
+                'name': mainCat}), 201
         else:
-            return render_template('actaResults.html', cat1=sortedCatWrong[0], cat2=sortedCatWrong[1], cat3=sortedCatWrong[2],
-                cat4=sortedCatWrong[3], cat5=sortedCatWrong[4], alert=True, name=mainCat)
+            return jsonify({
+                'code': 'ALERT',
+                'cat': MyEncoder().encode(sortedCatWrong),
+                'name': mainCat}), 201
+    else:
+        return jsonify({
+            'code': 'ALERT',
+            'cat': MyEncoder().encode(sortedCatWrong),
+            'name': mainCat}), 201
+            #return render_template('actaResults.html', cat1=sortedCatWrong[0], cat2=sortedCatWrong[1], cat3=sortedCatWrong[2],
+            #    cat4=sortedCatWrong[3], cat5=sortedCatWrong[4], alert=True, name=mainCat)
         #for c in sortedCon:
         #    c.sortText()
-        return render_template('actaResults.html', cat1=sortedCatWrong[0], cat2=sortedCatWrong[1], cat3=sortedCatWrong[2],
-            cat4=sortedCatWrong[3], cat5=sortedCatWrong[4], catRight=sortedCatRight)
 
 def nl_detect(tx, look, catRight, catWrong):
     repeated = False
