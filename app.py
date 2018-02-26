@@ -100,7 +100,7 @@ def upload_file():
 
     #print(f.filename)
 
-    mainCat = 'tecnologia'
+    mainCat = 'alimentos'
 
     #mainCat = request.form['mainCat']
     if (mainCat == 'tecnologia'):
