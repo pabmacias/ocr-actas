@@ -143,17 +143,29 @@ def upload_file():
         if (sortedCatRight[0].av >= 1):
             return jsonify({
                 'code': 'SUCCESS',
-                'cat': MyEncoder().encode(sortedCatRight),
+                'cat0': MyEncoder().encode(sortedCatRight[0]),
+                'cat1': MyEncoder().encode(sortedCatRight[1]),
+                'cat2': MyEncoder().encode(sortedCatRight[2]),
+                'cat3': MyEncoder().encode(sortedCatRight[3]),
+                'cat4': MyEncoder().encode(sortedCatRight[4]),
                 'name': mainCat}), 201
         else:
             return jsonify({
                 'code': 'ALERT',
-                'cat': MyEncoder().encode(sortedCatWrong),
+                'cat0': MyEncoder().encode(sortedCatWrong[0]),
+                'cat1': MyEncoder().encode(sortedCatWrong[1]),
+                'cat2': MyEncoder().encode(sortedCatWrong[2]),
+                'cat3': MyEncoder().encode(sortedCatWrong[3]),
+                'cat4': MyEncoder().encode(sortedCatWrong[4]),
                 'name': mainCat}), 201
     else:
         return jsonify({
             'code': 'ALERT',
-            'cat': MyEncoder().encode(sortedCatWrong),
+            'cat0': MyEncoder().encode(sortedCatWrong[0]),
+            'cat1': MyEncoder().encode(sortedCatWrong[1]),
+            'cat2': MyEncoder().encode(sortedCatWrong[2]),
+            'cat3': MyEncoder().encode(sortedCatWrong[3]),
+            'cat4': MyEncoder().encode(sortedCatWrong[4]),
             'name': mainCat}), 201
             #return render_template('actaResults.html', cat1=sortedCatWrong[0], cat2=sortedCatWrong[1], cat3=sortedCatWrong[2],
             #    cat4=sortedCatWrong[3], cat5=sortedCatWrong[4], alert=True, name=mainCat)
