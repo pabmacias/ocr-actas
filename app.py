@@ -148,7 +148,7 @@ def upload_file():
     #    print ("\n")
 
     if (len(sortedCatRight) > 0):
-        if (sortedCatRight[0].av >= 2 and sortedCatRight[1].av >= 1):
+        if (sortedCatRight[0].av >= 3 and sortedCatRight[1].av >= 1):
             return jsonify({
                 'code': 'SUCCESS',
                 'cat0': sortedCatRight[0].name,
