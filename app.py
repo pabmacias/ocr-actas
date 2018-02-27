@@ -137,7 +137,7 @@ def upload_file():
     for c in sortedCatWrong:
         c.sortText()
 
-    print (json.dumps(MyEncoder().encode(sortedCatRight)))
+    #print (json.dumps(MyEncoder().encode(sortedCatRight)))
 
     if (len(sortedCatRight) > 0):
         if (sortedCatRight[0].av >= 1):
