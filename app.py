@@ -140,7 +140,7 @@ def upload_file():
     #print (json.dumps(MyEncoder().encode(sortedCatRight)))
 
     if (len(sortedCatRight) > 0):
-        if (sortedCatRight[0].av >= 1):
+        if (sortedCatRight[0].av >= 2):
             return jsonify({
                 'code': 'SUCCESS',
                 'cat0': sortedCatRight[0].name,
