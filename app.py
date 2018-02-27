@@ -88,6 +88,7 @@ def upload_file():
     #print(request.json)
     #url='http://bpm.nearshoremx.com/sysNDS/es/neoclassic/cases/cases_ShowDocument?a=9555767175a905da86a5c71075418462&v=1'
     url = request.json.get("url")
+    mainCat = request.json.get("category")
     #print (url)
     local_filename = "acta.pdf"
     r = requests.get(url, stream=True)
@@ -100,14 +101,14 @@ def upload_file():
 
     #print(f.filename)
 
-    mainCat = 'alimentos'
+    #mainCat = 'alimentos'
 
     #mainCat = request.form['mainCat']
-    if (mainCat == 'tecnologia'):
+    if (mainCat == 'Tecnologia'):
         look=['technology and computing', 'computer science']
-    if (mainCat == 'alimentos'):
+    if (mainCat == 'Alimentaria'):
         look=['agriculture and forestry', 'food industry', 'food and drink', 'food processors']
-    if (mainCat == 'constructora'):
+    if (mainCat == 'Construccion'):
         look=['construction', 'remodeling and construction', 'home improvement and repair', 'interior decorating',
                     'gardening and landscaping', 'home furnishings', 'home improvement and repair', 'real estate']
 
@@ -140,32 +141,26 @@ def upload_file():
     #print (json.dumps(MyEncoder().encode(sortedCatRight)))
 
     if (len(sortedCatRight) > 0):
-        if (sortedCatRight[0].av >= 1):
+        if (sortedCatRight[0].av >= 2):
             return jsonify({
                 'code': 'SUCCESS',
-                'cat0': MyEncoder().encode(sortedCatRight[0]),
-                'cat1': MyEncoder().encode(sortedCatRight[1]),
-                'cat2': MyEncoder().encode(sortedCatRight[2]),
-                'cat3': MyEncoder().encode(sortedCatRight[3]),
-                'cat4': MyEncoder().encode(sortedCatRight[4]),
+                'cat0': sortedCatRight[0].name,
+                'cat1': sortedCatRight[1].name,
+                'cat2': sortedCatRight[2].name,
                 'name': mainCat}), 201
         else:
             return jsonify({
                 'code': 'ALERT',
-                'cat0': MyEncoder().encode(sortedCatWrong[0]),
-                'cat1': MyEncoder().encode(sortedCatWrong[1]),
-                'cat2': MyEncoder().encode(sortedCatWrong[2]),
-                'cat3': MyEncoder().encode(sortedCatWrong[3]),
-                'cat4': MyEncoder().encode(sortedCatWrong[4]),
+                'cat0': sortedCatWrong[0].name,
+                'cat1': sortedCatWrong[1].name,
+                'cat2': sortedCatWrong[2].name,
                 'name': mainCat}), 201
     else:
         return jsonify({
             'code': 'ALERT',
-            'cat0': MyEncoder().encode(sortedCatWrong[0]),
-            'cat1': MyEncoder().encode(sortedCatWrong[1]),
-            'cat2': MyEncoder().encode(sortedCatWrong[2]),
-            'cat3': MyEncoder().encode(sortedCatWrong[3]),
-            'cat4': MyEncoder().encode(sortedCatWrong[4]),
+            'cat0': sortedCatWrong[0].name,
+            'cat1': sortedCatWrong[1].name,
+            'cat2': sortedCatWrong[2].name,
             'name': mainCat}), 201
             #return render_template('actaResults.html', cat1=sortedCatWrong[0], cat2=sortedCatWrong[1], cat3=sortedCatWrong[2],
             #    cat4=sortedCatWrong[3], cat5=sortedCatWrong[4], alert=True, name=mainCat)
