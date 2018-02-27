@@ -141,6 +141,11 @@ def upload_file():
     print (sortedCatRight[1].av)
     print (sortedCatRight[2].av)
 
+    for cw in sortedCatWrong:
+        print (cw.name)
+        print (cw.av)
+        print ("\n")
+
     if (len(sortedCatRight) > 0):
         if (sortedCatRight[0].av >= 2 and sortedCatRight[1].av >= 2):
             return jsonify({
