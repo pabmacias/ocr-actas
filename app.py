@@ -28,8 +28,8 @@ client = vision.ImageAnnotatorClient()
 
 natural_language_understanding = NaturalLanguageUnderstandingV1(
     version='2017-02-27',
-    username='016622a0-6952-42ac-82fa-61a43ec6b6ca',
-    password='X35haiEXqzTS')
+    username='9db663dd-120c-416a-b429-1345686feb7a',
+    password='quWhsaVKbLrk')
 
 class MyEncoder(JSONEncoder):
         def default(self, o):
