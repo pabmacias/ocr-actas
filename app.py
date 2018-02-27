@@ -137,13 +137,16 @@ def upload_file():
     for c in sortedCatWrong:
         c.sortText()
 
-    #print (json.dumps(MyEncoder().encode(sortedCatRight)))
+    print (sortedCatRight[0].av)
+    print (sortedCatRight[1].av)
+    print (sortedCatRight[2].av)
 
     if (len(sortedCatRight) > 0):
-        if (sortedCatRight[0].av >= 3):
+        if (sortedCatRight[0].av >= 1 and sortedCatRight[1].av >= 1):
             return jsonify({
                 'code': 'SUCCESS',
                 'cat0': sortedCatRight[0].name,
+                'cat0av': sortedCatRight[0].av,
                 'cat1': sortedCatRight[1].name,
                 'cat2': sortedCatRight[2].name,
                 'name': mainCat}), 201
