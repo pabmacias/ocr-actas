@@ -110,7 +110,8 @@ def upload_file():
         look=['agriculture and forestry', 'food industry', 'food and drink', 'food processors']
     if (mainCat == 'Construccion'):
         look=['construction', 'remodeling and construction', 'home improvement and repair', 'interior decorating',
-                    'gardening and landscaping', 'home furnishings', 'home improvement and repair', 'real estate']
+                    'gardening and landscaping', 'home furnishings', 'home improvement and repair', 'real estate',
+                    'personal finance', 'lending', 'finance']
 
     print (look)
 
@@ -141,13 +142,13 @@ def upload_file():
     print (sortedCatRight[1].av)
     print (sortedCatRight[2].av)
 
-    for cw in sortedCatWrong:
-        print (cw.name)
-        print (cw.av)
-        print ("\n")
+    #for cw in sortedCatWrong:
+    #    print (cw.name)
+    #    print (cw.av)
+    #    print ("\n")
 
     if (len(sortedCatRight) > 0):
-        if (sortedCatRight[0].av >= 2 and sortedCatRight[1].av >= 2):
+        if (sortedCatRight[0].av >= 2 and sortedCatRight[1].av >= 1):
             return jsonify({
                 'code': 'SUCCESS',
                 'cat0': sortedCatRight[0].name,
