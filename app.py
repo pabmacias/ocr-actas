@@ -112,6 +112,8 @@ def upload_file():
         look=['construction', 'remodeling and construction', 'home improvement and repair', 'interior decorating',
                     'gardening and landscaping', 'home furnishings', 'home improvement and repair', 'real estate']
 
+    print (look)
+
     catRight=[]
     catWrong=[]
 
@@ -128,8 +130,6 @@ def upload_file():
 #       sortedCon = sorted(con, key=lambda c: c.av, reverse=True)
 #        sortedEnt = sorted(ent, key=lambda c: c.av, reverse=True)
 #        sortedKey = sorted(key, key=lambda c: c.av, reverse=True)
-
-    print(sortedCatRight)
 
     for c in sortedCatRight:
         c.sortText()
