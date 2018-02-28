@@ -86,10 +86,6 @@ def allowed_file(filename):
 def Index():
     return render_template('index.html')
 
-@app.route('/img')
-def down_img():
-    return '<img src=' + url_for('static',filename='example0.jpg') + '>'
-
 @app.route('/acta', methods=['POST'])
 def upload_file():
     #print(request.json)
@@ -151,7 +147,7 @@ def upload_file():
         draw_boxes(image, bounds, 'red')
         fileout1 = fileout + str(fi) + ".jpg"
         if fileout1 is not 0:
-            image.save("static/" + fileout1)
+            image.save(fileout1)
         else:
             image.show()
         fi+=1
@@ -476,20 +472,16 @@ def get_text_from_files(path, look, catRight, catWrong, words, bounds):
     for page in texts.pages:
         for block in page.blocks:
             for paragraph in block.paragraphs:
-                paragraph_text = ""
                 for word in paragraph.words:
                     t = ""
-                    paragraph_text = paragraph_text + " "
                     for symbol in word.symbols:
                         t = t+symbol.text
-                        paragraph_text = paragraph_text + symbol.text
                     #print (t + " = " + word1)
                     for w in words:
                         if (t == w):
                             print (t + " = " + w)
                             bounds.append(paragraph.bounding_box)
                             bounds.append(word.bounding_box)
-                nl_detect(paragraph_text, look, catRight, catWrong);
 
     #for page in texts.pages:
     #    for block in page.blocks:
