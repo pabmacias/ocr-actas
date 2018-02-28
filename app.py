@@ -88,7 +88,7 @@ def Index():
 
 @app.route('/img')
 def down_img():
-    return '<img src=' + url_for('/',filename='example0.jpg') + '>' 
+    return '<img src=' + url_for('static',filename='example0.jpg') + '>'
 
 @app.route('/acta', methods=['POST'])
 def upload_file():
@@ -151,7 +151,7 @@ def upload_file():
         draw_boxes(image, bounds, 'red')
         fileout1 = fileout + str(fi) + ".jpg"
         if fileout1 is not 0:
-            image.save(fileout1)
+            image.save("static/" + fileout1)
         else:
             image.show()
         fi+=1
