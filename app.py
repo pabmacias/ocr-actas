@@ -127,7 +127,7 @@ def upload_file():
 
     #word1 = "edgar"
     bounds = []
-
+    colors = []
     words = []
 
     for w in wLook:
@@ -151,9 +151,10 @@ def upload_file():
 
     for image in images:
         bounds=[]
-        get_text_from_files(image, look, catRight, catWrong, words, bounds)
+        colors=[]
+        get_text_from_files(image, look, catRight, catWrong, words, bounds, colors)
         if (len(bounds) > 0):
-            draw_boxes(image, bounds, 'red')
+            draw_boxes(image, bounds, colors)
             fileout1 = fileout + str(fi) + ".jpg"
             if fileout1 is not 0:
                 image.save("static/" + fileout1)
@@ -210,16 +211,18 @@ def upload_file():
         #for c in sortedCon:
         #    c.sortText()
 
-def draw_boxes(image, bounds, color):
+def draw_boxes(image, bounds, colors):
     """Draw a border around the image using the hints in the vector list."""
     draw = ImageDraw.Draw(image)
 
+    ci=0
     for bound in bounds:
         draw.line([
             bound.vertices[0].x, bound.vertices[0].y,
             bound.vertices[1].x, bound.vertices[1].y,
             bound.vertices[2].x, bound.vertices[2].y,
-            bound.vertices[3].x, bound.vertices[3].y], fill=color, width=9)
+            bound.vertices[3].x, bound.vertices[3].y], fill=colors[ci], width=9)
+        ci+=1
     return image
 
 def nl_detect(tx, look, catRight, catWrong):
@@ -459,7 +462,7 @@ def nl_detect(tx, look, catRight, catWrong):
         print("Could not read text: ")
         print(tx)
 
-def get_text_from_files(path, look, catRight, catWrong, words, bounds):
+def get_text_from_files(path, look, catRight, catWrong, words, bounds, colors):
     #client = vision.ImageAnnotatorClient()
 
     #bounds = []
@@ -489,12 +492,29 @@ def get_text_from_files(path, look, catRight, catWrong, words, bounds):
                         t = t+symbol.text
                         paragraph_text = paragraph_text + symbol.text
                     #print (t + " = " + word1)
+                    wi=0
                     for w in words:
                         if (t == w):
-                            print (t + " = " + w)
-                            bounds.append(paragraph.bounding_box)
+                            #print (t + " = " + w)
+                            #bounds.append(paragraph.bounding_box)
+                            #if (wi < 3):
+                            #    colors.append("red")
+                            #elif (wi >= 3 and wi < 6):
+                            #    colors.append("green")
+                            #else:
+                            #    colors.append("blue")
                             bounds.append(word.bounding_box)
-                #nl_detect(paragraph_text, look, catRight, catWrong);
+                            if (wi < 3):
+                                colors.append("red")
+                                print(t + " = red")
+                            elif (wi >= 3 and wi < 6):
+                                colors.append("green")
+                                print(t + " = green")
+                            else:
+                                colors.append("blue")
+                                print(t + " = blue")
+                        wi+=1
+                nl_detect(paragraph_text, look, catRight, catWrong);
 
     #for page in texts.pages:
     #    for block in page.blocks:
