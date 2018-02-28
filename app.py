@@ -9,6 +9,9 @@ from wand.image import Image
 import requests
 import json
 from json import JSONEncoder
+from PIL import Image, ImageDraw
+from enum import Enum
+import argparse
 
 from watson_developer_cloud import NaturalLanguageUnderstandingV1
 from watson_developer_cloud.natural_language_understanding_v1 import Features, CategoriesOptions, KeywordsOptions, ConceptsOptions, RelationsOptions, EntitiesOptions
@@ -83,12 +86,17 @@ def allowed_file(filename):
 def Index():
     return render_template('index.html')
 
+@app.route('/img')
+def down_img():
+    return '<img src=' + url_for('static',filename='example0.jpg') + '>'
+
 @app.route('/acta', methods=['POST'])
 def upload_file():
     #print(request.json)
     #url='http://bpm.nearshoremx.com/sysNDS/es/neoclassic/cases/cases_ShowDocument?a=9555767175a905da86a5c71075418462&v=1'
     url = request.json.get("url")
     mainCat = request.json.get("category")
+    wLook = [request.json.get("word1"), request.json.get("word2"), request.json.get("word3")]
     #print (url)
     local_filename = "acta.pdf"
     r = requests.get(url, stream=True)
@@ -113,6 +121,18 @@ def upload_file():
                     'gardening and landscaping', 'home furnishings', 'home improvement and repair', 'real estate',
                     'personal finance', 'lending', 'finance']
 
+    #word1 = "edgar"
+    bounds = []
+
+    words = []
+
+    for w in wLook:
+        words.append(w)
+        words.append(w.upper())
+        words.append(w.title())
+
+    print (words)
+
     print (look)
 
     catRight=[]
@@ -121,10 +141,20 @@ def upload_file():
     alert = False
 
     images = convert_from_path(local_filename)
+    fileout="example"
+    fi=0
 #    os.system("rm " + local_filename)
 
     for image in images:
-        get_text_from_files(image, look, catRight, catWrong)
+        bounds=[]
+        get_text_from_files(image, look, catRight, catWrong, words, bounds)
+        draw_boxes(image, bounds, 'red')
+        fileout1 = fileout + str(fi) + ".jpg"
+        if fileout1 is not 0:
+            image.save("static/" + fileout1)
+        else:
+            image.show()
+        fi+=1
 
     sortedCatRight = sorted(catRight, key=lambda c: c.av, reverse=True)
     sortedCatWrong = sorted(catWrong, key=lambda c: c.av, reverse=True)
@@ -174,6 +204,18 @@ def upload_file():
             #    cat4=sortedCatWrong[3], cat5=sortedCatWrong[4], alert=True, name=mainCat)
         #for c in sortedCon:
         #    c.sortText()
+
+def draw_boxes(image, bounds, color):
+    """Draw a border around the image using the hints in the vector list."""
+    draw = ImageDraw.Draw(image)
+
+    for bound in bounds:
+        draw.line([
+            bound.vertices[0].x, bound.vertices[0].y,
+            bound.vertices[1].x, bound.vertices[1].y,
+            bound.vertices[2].x, bound.vertices[2].y,
+            bound.vertices[3].x, bound.vertices[3].y], fill=color, width=9)
+    return image
 
 def nl_detect(tx, look, catRight, catWrong):
     repeated = False
@@ -412,7 +454,7 @@ def nl_detect(tx, look, catRight, catWrong):
         print("Could not read text: ")
         print(tx)
 
-def get_text_from_files(path, look, catRight, catWrong):
+def get_text_from_files(path, look, catRight, catWrong, words, bounds):
     #client = vision.ImageAnnotatorClient()
 
     #bounds = []
@@ -436,11 +478,31 @@ def get_text_from_files(path, look, catRight, catWrong):
             for paragraph in block.paragraphs:
                 paragraph_text = ""
                 for word in paragraph.words:
+                    t = ""
                     paragraph_text = paragraph_text + " "
                     for symbol in word.symbols:
+                        t = t+symbol.text
                         paragraph_text = paragraph_text + symbol.text
-                #print("Paragraph: " + paragraph_text + "\n")
+                    #print (t + " = " + word1)
+                    for w in words:
+                        if (t == w):
+                            print (t + " = " + w)
+                            bounds.append(paragraph.bounding_box)
+                            bounds.append(word.bounding_box)
                 nl_detect(paragraph_text, look, catRight, catWrong);
+
+    #for page in texts.pages:
+    #    for block in page.blocks:
+    #        for paragraph in block.paragraphs:
+    #            paragraph_text = ""
+    #            for word in paragraph.words:
+    #                if (word == word1):
+    #                    print('Block Bounds:\n {}'.format(block.bounding_box))
+    #                paragraph_text = paragraph_text + " "
+    #                for symbol in word.symbols:
+    #                    paragraph_text = paragraph_text + symbol.text
+                #print("Paragraph: " + paragraph_text + "\n")
+    #            nl_detect(paragraph_text, look, catRight, catWrong);
 
         #nl_detect(texts[0].description)
         #entities_text(texts[0].description)
