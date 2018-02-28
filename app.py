@@ -86,6 +86,10 @@ def allowed_file(filename):
 def Index():
     return render_template('index.html')
 
+@app.route('/img')
+def down_img():
+    return '<img src=' + url_for('/',filename='example0.jpg') + '>' 
+
 @app.route('/acta', methods=['POST'])
 def upload_file():
     #print(request.json)
