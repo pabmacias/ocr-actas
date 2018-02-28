@@ -152,13 +152,14 @@ def upload_file():
     for image in images:
         bounds=[]
         get_text_from_files(image, look, catRight, catWrong, words, bounds)
-        draw_boxes(image, bounds, 'red')
-        fileout1 = fileout + str(fi) + ".jpg"
-        if fileout1 is not 0:
-            image.save("static/" + fileout1)
-        else:
-            image.show()
-        fi+=1
+        if (len(bounds) > 0):
+            draw_boxes(image, bounds, 'red')
+            fileout1 = fileout + str(fi) + ".jpg"
+            if fileout1 is not 0:
+                image.save("static/" + fileout1)
+            else:
+                image.show()
+            fi+=1
 
     sortedCatRight = sorted(catRight, key=lambda c: c.av, reverse=True)
     sortedCatWrong = sorted(catWrong, key=lambda c: c.av, reverse=True)
@@ -493,7 +494,7 @@ def get_text_from_files(path, look, catRight, catWrong, words, bounds):
                             print (t + " = " + w)
                             bounds.append(paragraph.bounding_box)
                             bounds.append(word.bounding_box)
-                nl_detect(paragraph_text, look, catRight, catWrong);
+                #nl_detect(paragraph_text, look, catRight, catWrong);
 
     #for page in texts.pages:
     #    for block in page.blocks:
