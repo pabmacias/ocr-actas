@@ -90,6 +90,10 @@ def Index():
 def down_img():
     return '<img src=' + url_for('static',filename='example0.jpg') + '>'
 
+@app.route('/img2')
+def down_img():
+    return url_for('static',filename='example0.jpg')
+
 @app.route('/acta', methods=['POST'])
 def upload_file():
     #print(request.json)
