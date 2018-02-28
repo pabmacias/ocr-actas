@@ -129,6 +129,7 @@ def upload_file():
     bounds = []
     colors = []
     words = []
+    countW = [0, 0, 0]
 
     for w in wLook:
         words.append(w)
@@ -152,7 +153,7 @@ def upload_file():
     for image in images:
         bounds=[]
         colors=[]
-        get_text_from_files(image, look, catRight, catWrong, words, bounds, colors)
+        get_text_from_files(image, look, catRight, catWrong, words, bounds, colors, countW)
         if (len(bounds) > 0):
             draw_boxes(image, bounds, colors)
             fileout1 = fileout + str(fi) + ".jpg"
@@ -174,9 +175,9 @@ def upload_file():
     for c in sortedCatWrong:
         c.sortText()
 
-    print (sortedCatRight[0].av)
-    print (sortedCatRight[1].av)
-    print (sortedCatRight[2].av)
+    #print (sortedCatRight[0].av)
+    #print (sortedCatRight[1].av)
+    #print (sortedCatRight[2].av)
 
     #for cw in sortedCatWrong:
     #    print (cw.name)
@@ -191,6 +192,9 @@ def upload_file():
                 'cat0av': sortedCatRight[0].av,
                 'cat1': sortedCatRight[1].name,
                 'cat2': sortedCatRight[2].name,
+                'cw1': countW[0],
+                'cw2': countW[1],
+                'cw3': countW[2],
                 'name': mainCat}), 201
         else:
             return jsonify({
@@ -198,6 +202,9 @@ def upload_file():
                 'cat0': sortedCatWrong[0].name,
                 'cat1': sortedCatWrong[1].name,
                 'cat2': sortedCatWrong[2].name,
+                'cw1': countW[0],
+                'cw2': countW[1],
+                'cw3': countW[2],
                 'name': mainCat}), 201
     else:
         return jsonify({
@@ -205,6 +212,9 @@ def upload_file():
             'cat0': sortedCatWrong[0].name,
             'cat1': sortedCatWrong[1].name,
             'cat2': sortedCatWrong[2].name,
+            'cw1': countW[0],
+            'cw2': countW[1],
+            'cw3': countW[2],
             'name': mainCat}), 201
             #return render_template('actaResults.html', cat1=sortedCatWrong[0], cat2=sortedCatWrong[1], cat3=sortedCatWrong[2],
             #    cat4=sortedCatWrong[3], cat5=sortedCatWrong[4], alert=True, name=mainCat)
@@ -462,7 +472,7 @@ def nl_detect(tx, look, catRight, catWrong):
         print("Could not read text: ")
         print(tx)
 
-def get_text_from_files(path, look, catRight, catWrong, words, bounds, colors):
+def get_text_from_files(path, look, catRight, catWrong, words, bounds, colors, countW):
     #client = vision.ImageAnnotatorClient()
 
     #bounds = []
@@ -506,12 +516,15 @@ def get_text_from_files(path, look, catRight, catWrong, words, bounds, colors):
                             bounds.append(word.bounding_box)
                             if (wi < 3):
                                 colors.append("red")
+                                countW[0]+=1
                                 print(t + " = red")
                             elif (wi >= 3 and wi < 6):
                                 colors.append("green")
+                                countW[1]+=1
                                 print(t + " = green")
                             else:
                                 colors.append("blue")
+                                countW[2]+=1
                                 print(t + " = blue")
                         wi+=1
                 nl_detect(paragraph_text, look, catRight, catWrong);
