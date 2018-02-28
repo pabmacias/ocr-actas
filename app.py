@@ -87,7 +87,7 @@ def Index():
     return render_template('index.html')
 
 @app.route('/img')
-def down_img():
+def down_img2():
     return '<img src=' + url_for('static',filename='example0.jpg') + '>'
 
 @app.route('/img2')
