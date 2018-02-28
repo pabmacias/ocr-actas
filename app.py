@@ -476,16 +476,20 @@ def get_text_from_files(path, look, catRight, catWrong, words, bounds):
     for page in texts.pages:
         for block in page.blocks:
             for paragraph in block.paragraphs:
+                paragraph_text = ""
                 for word in paragraph.words:
                     t = ""
+                    paragraph_text = paragraph_text + " "
                     for symbol in word.symbols:
                         t = t+symbol.text
+                        paragraph_text = paragraph_text + symbol.text
                     #print (t + " = " + word1)
                     for w in words:
                         if (t == w):
                             print (t + " = " + w)
                             bounds.append(paragraph.bounding_box)
                             bounds.append(word.bounding_box)
+                nl_detect(paragraph_text, look, catRight, catWrong);
 
     #for page in texts.pages:
     #    for block in page.blocks:
