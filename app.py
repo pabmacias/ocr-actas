@@ -188,10 +188,10 @@ def upload_file():
         if (sortedCatRight[0].av >= 3 and sortedCatRight[1].av >= 1):
             return jsonify({
                 'code': 'SUCCESS',
-                'cat0': sortedCatRight[0].name,
-                'cat0av': sortedCatRight[0].av,
-                'cat1': sortedCatRight[1].name,
-                'cat2': sortedCatRight[2].name,
+                #'cat0': sortedCatRight[0].name,
+                #'cat0av': sortedCatRight[0].av,
+                #'cat1': sortedCatRight[1].name,
+                #'cat2': sortedCatRight[2].name,
                 'cw1': countW[0],
                 'cw2': countW[1],
                 'cw3': countW[2],
@@ -199,9 +199,9 @@ def upload_file():
         else:
             return jsonify({
                 'code': 'ALERT',
-                'cat0': sortedCatWrong[0].name,
-                'cat1': sortedCatWrong[1].name,
-                'cat2': sortedCatWrong[2].name,
+                #'cat0': sortedCatWrong[0].name,
+                #'cat1': sortedCatWrong[1].name,
+                #'cat2': sortedCatWrong[2].name,
                 'cw1': countW[0],
                 'cw2': countW[1],
                 'cw3': countW[2],
@@ -209,9 +209,9 @@ def upload_file():
     else:
         return jsonify({
             'code': 'ALERT',
-            'cat0': sortedCatWrong[0].name,
-            'cat1': sortedCatWrong[1].name,
-            'cat2': sortedCatWrong[2].name,
+            #'cat0': sortedCatWrong[0].name,
+            #'cat1': sortedCatWrong[1].name,
+            #'cat2': sortedCatWrong[2].name,
             'cw1': countW[0],
             'cw2': countW[1],
             'cw3': countW[2],
@@ -527,7 +527,7 @@ def get_text_from_files(path, look, catRight, catWrong, words, bounds, colors, c
                                 countW[2]+=1
                                 print(t + " = blue")
                         wi+=1
-                nl_detect(paragraph_text, look, catRight, catWrong);
+                #nl_detect(paragraph_text, look, catRight, catWrong);
 
     #for page in texts.pages:
     #    for block in page.blocks:
