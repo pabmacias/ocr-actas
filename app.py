@@ -78,6 +78,14 @@ class Text:
         self.av = av
         self.name = name
 
+class Acta:
+    def __init__(self, url, cats, cons, words, text):
+        self.words = words
+        self.cats = cats
+        self.url = url
+        self.text = text
+        self.cons = cons
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -99,7 +107,7 @@ def upload_file():
     #print(request.json)
     #url='http://bpm.nearshoremx.com/sysNDS/es/neoclassic/cases/cases_ShowDocument?a=9555767175a905da86a5c71075418462&v=1'
     url = request.json.get("url")
-    mainCat = request.json.get("category")
+    #mainCat = request.json.get("category")
     wLook = [request.json.get("word1"), request.json.get("word2"), request.json.get("word3")]
     #print (url)
     local_filename = "acta.pdf"
@@ -116,20 +124,21 @@ def upload_file():
     #mainCat = 'alimentos'
 
     #mainCat = request.form['mainCat']
-    if (mainCat == 'Tecnologia'):
-        look=['technology and computing', 'computer science']
-    if (mainCat == 'Alimentaria'):
-        look=['agriculture and forestry', 'food industry', 'food and drink', 'food processors']
-    if (mainCat == 'Construccion'):
-        look=['construction', 'remodeling and construction', 'home improvement and repair', 'interior decorating',
-                    'gardening and landscaping', 'home furnishings', 'home improvement and repair', 'real estate',
-                    'personal finance', 'lending', 'finance']
+    #if (mainCat == 'Tecnologia'):
+    #    look=['technology and computing', 'computer science']
+    #if (mainCat == 'Alimentaria'):
+    #    look=['agriculture and forestry', 'food industry', 'food and drink', 'food processors']
+    #if (mainCat == 'Construccion'):
+    #    look=['construction', 'remodeling and construction', 'home improvement and repair', 'interior decorating',
+    #                'gardening and landscaping', 'home furnishings', 'home improvement and repair', 'real estate',
+    #                'personal finance', 'lending', 'finance']
 
     #word1 = "edgar"
     bounds = []
     colors = []
     words = []
     countW = [0, 0, 0]
+    imgArr = []
 
     for w in wLook:
         words.append(w)
@@ -137,8 +146,6 @@ def upload_file():
         words.append(w.title())
 
     print (words)
-
-    print (look)
 
     catRight=[]
     catWrong=[]
@@ -153,7 +160,7 @@ def upload_file():
     for image in images:
         bounds=[]
         colors=[]
-        get_text_from_files(image, look, catRight, catWrong, words, bounds, colors, countW)
+        get_text_from_files(image, catRight, catWrong, words, bounds, colors, countW, imgArr, fi)
         if (len(bounds) > 0):
             draw_boxes(image, bounds, colors)
             fileout1 = fileout + str(fi) + ".jpg"
@@ -162,6 +169,36 @@ def upload_file():
             else:
                 image.show()
             fi+=1
+
+    jImg = []
+
+    for im in imgArr:
+        jCats = []
+        jCons = []
+        jWords= []
+        for c in im.cats:
+            jCats.append({
+                "name": c.name,
+                "av": c.av
+            })
+        for c in im.cons:
+            jCons.append({
+                "name": c.name,
+                "av": c.av
+            })
+        for w in im.words:
+            jWords.append({
+                "word": w
+            })
+        jImg.append({
+            "url": im.url,
+            "categories": jCats,
+            "concepts": jCons,
+            "words": jWords,
+            "text": im.text
+        })
+
+    return jsonify(jImg)
 
     sortedCatRight = sorted(catRight, key=lambda c: c.av, reverse=True)
     sortedCatWrong = sorted(catWrong, key=lambda c: c.av, reverse=True)
@@ -235,8 +272,10 @@ def draw_boxes(image, bounds, colors):
         ci+=1
     return image
 
-def nl_detect(tx, look, catRight, catWrong):
+def nl_detect(tx):
     repeated = False
+    catArr=[]
+    conArr=[]
 
     try:
         response = natural_language_understanding.analyze(
@@ -255,224 +294,122 @@ def nl_detect(tx, look, catRight, catWrong):
                 if (la[1] != 'law, govt and politics' and la[1] != 'society' and la[1] != 'government'
                   and la[1] != 'hobbies and interests' and la[1] != 'legal issues' and tx != 'A DOS'
                   and la[1] != 'travel'):
-                    for lo in look:
-                        if (right):
+                    for ct in catArr:
+                        if (ct.name == la[1]):
+                            repeated = True
                             break
-                        for l in la:
-                            if (l == lo):
-                                right = True
-                                break
-                    if (right):
-                        for ct in catRight:
-                            if (ct.name == la[1]):
-                                repeated = True
-                                break
-                        if (repeated == False):
-                            catRight.append(Category(float(c['score']), la[1], tx))
-                        else:
-                            ct.av += float(c['score'])
-                            #if (len(la) < 3):
-                            ct.text.append(Text(float(c['score']), tx))
-                            repeated = False
-
-                        if (len(la) >= 3):
-                            for ct in catRight:
-                                if (ct.name == la[2]):
-                                    repeated = True
-                                    break
-                            if (repeated == False):
-                                catRight.append(Category(float(c['score']), la[2], tx))
-                            else:
-                                ct.av += float(c['score'])
-                                #if (len(la) < 4):
-                                ct.text.append(Text(float(c['score']), tx))
-                                repeated = False
-
-                        if (len(la) >= 4):
-                            for ct in catRight:
-                                if (ct.name == la[3]):
-                                    repeated = True
-                                    break
-                            if (repeated == False):
-                                catRight.append(Category(float(c['score']), la[3], tx))
-                            else:
-                                ct.av += float(c['score'])
-                                ct.text.append(Text(float(c['score']), tx))
-                                repeated = False
-
-                        if (len(la) >= 5):
-                            for ct in catRight:
-                                if (ct.name == la[4]):
-                                    repeated = True
-                                    break
-                            if (repeated == False):
-                                catRight.append(Category(float(c['score']), la[4], tx))
-                            else:
-                                ct.av += float(c['score'])
-                                ct.text.append(Text(float(c['score']), tx))
-                                repeated = False
-
-                        if (len(la) >= 6):
-                            for ct in catRight:
-                                if (ct.name == la[5]):
-                                    repeated = True
-                                    break
-                            if (repeated == False):
-                                catRight.append(Category(float(c['score']), la[5], tx))
-                            else:
-                                ct.av += float(c['score'])
-                                ct.text.append(Text(float(c['score']), tx))
-                                repeated = False
+                    if (repeated == False):
+                        catArr.append(Category(float(c['score']), la[1], tx))
                     else:
-                        for ct in catWrong:
-                            if (ct.name == la[1]):
+                        ct.av += float(c['score'])
+                        #if (len(la) < 3):
+                        ct.text.append(Text(float(c['score']), tx))
+                        repeated = False
+
+                    if (len(la) >= 3):
+                        for ct in catArr:
+                            if (ct.name == la[2]):
                                 repeated = True
                                 break
                         if (repeated == False):
-                            catWrong.append(Category(float(c['score']), la[1], tx))
+                            catArr.append(Category(float(c['score']), la[2], tx))
                         else:
                             ct.av += float(c['score'])
-                            #if (len(la) < 3):
+                            #if (len(la) < 4):
                             ct.text.append(Text(float(c['score']), tx))
                             repeated = False
 
-                        if (len(la) >= 3):
-                            for ct in catWrong:
-                                if (ct.name == la[2]):
-                                    repeated = True
-                                    break
-                            if (repeated == False):
-                                catWrong.append(Category(float(c['score']), la[2], tx))
-                            else:
-                                ct.av += float(c['score'])
-                                #if (len(la) < 4):
-                                ct.text.append(Text(float(c['score']), tx))
-                                repeated = False
+                    if (len(la) >= 4):
+                        for ct in catArr:
+                            if (ct.name == la[3]):
+                                repeated = True
+                                break
+                        if (repeated == False):
+                            catArr.append(Category(float(c['score']), la[3], tx))
+                        else:
+                            ct.av += float(c['score'])
+                            ct.text.append(Text(float(c['score']), tx))
+                            repeated = False
 
-                        if (len(la) >= 4):
-                            for ct in catWrong:
-                                if (ct.name == la[3]):
-                                    repeated = True
-                                    break
-                            if (repeated == False):
-                                catWrong.append(Category(float(c['score']), la[3], tx))
-                            else:
-                                ct.av += float(c['score'])
-                                ct.text.append(Text(float(c['score']), tx))
-                                repeated = False
+                    if (len(la) >= 5):
+                        for ct in catArr:
+                            if (ct.name == la[4]):
+                                repeated = True
+                                break
+                        if (repeated == False):
+                            catArr.append(Category(float(c['score']), la[4], tx))
+                        else:
+                            ct.av += float(c['score'])
+                            ct.text.append(Text(float(c['score']), tx))
+                            repeated = False
 
-                        if (len(la) >= 5):
-                            for ct in catWrong:
-                                if (ct.name == la[4]):
-                                    repeated = True
-                                    break
-                            if (repeated == False):
-                                catWrong.append(Category(float(c['score']), la[4], tx))
-                            else:
-                                ct.av += float(c['score'])
-                                ct.text.append(Text(float(c['score']), tx))
-                                repeated = False
-
-                        if (len(la) >= 6):
-                            for ct in catWrong:
-                                if (ct.name == la[5]):
-                                    repeated = True
-                                    break
-                            if (repeated == False):
-                                catWrong.append(Category(float(c['score']), la[5], tx))
-                            else:
-                                ct.av += float(c['score'])
-                                ct.text.append(Text(float(c['score']), tx))
-                                repeated = False
+                    if (len(la) >= 6):
+                        for ct in catArr:
+                            if (ct.name == la[5]):
+                                repeated = True
+                                break
+                        if (repeated == False):
+                            catArr.append(Category(float(c['score']), la[5], tx))
+                        else:
+                            ct.av += float(c['score'])
+                            ct.text.append(Text(float(c['score']), tx))
+                            repeated = False
         except:
             print("No categories found")
 
+        try:
+            for c in response['concepts']:
+                if (c['text'] != 'Ley' and c['text'] != 'Sociedad' and c['text'] != 'Acción'
+                    and c['text'] != 'Estado' and c['text'] != 'General'
+                    and c['text'] != 'USO' and c['text'] != 'Capital social'
+                    and c['text'] != 'Documento' and c['text'] != 'Día'
+                    and c['text'] != 'Ciudadano' and c['text'] != 'Firma electrónica'
+                    and c['text'] != 'Contrato' and c['text'] != 'Federación'
+                    and c['text'] != 'Representación' and c['text'] != 'Distrito federal'
+                    and c['text'] != 'Ciudad de México' and c['text'] != 'Persona jurídica'
+                    and c['text'] != 'Código civil' and c['text'] != 'Prueba'
+                    and c['text'] != 'Interés' and c['text'] != 'Persona física'
+                    and c['text'] != 'Firma digital' and c['text'] != 'El capital'
+                    and c['text'] != 'Sesenta' and c['text'] != 'Acto jurídico'
+                    and c['text'] != 'Firma' and c['text'] != 'Ocho'
+                    and c['text'] != 'Cooperativa' and c['text'] != 'Notario'
+                    and c['text'] != 'Procedimiento administrativo' and c['text'] != 'Señor'
+                    and c['text'] != 'Treinta' and c['text'] != 'Mensaje'
+                    and c['text'] != 'Juicio de amparo' and c['text'] != 'Plural'
+                    and c['text'] != 'Derecho' and c['text'] != 'Singular'
+                    and c['text'] != 'Notificación' and c['text'] != 'Agencia Estatal de Administración Tributaria'
+                    and c['text'] != 'El contrato social' and c['text'] != 'Consejero'
+                    and c['text'] != 'Verdad' and c['text'] != 'Dividendo'
+                    and c['text'] != 'Comisario' and c['text'] != 'Ley orgánica'
+                    and c['text'] != 'Mes' and c['text'] != 'Asamblea'
+                    and c['text'] != 'Veinte' and c['text'] != 'Vi'
+                    and c['text'] != 'Iniciativa legislativa popular' and c['text'] != 'Obligación'
+                    and c['text'] != 'El Caso' and c['text'] != 'Doce'
+                    and c['text'] != 'Contrato de fianza' and c['text'] != 'Libertad provisional'
+                    and c['text'] != 'Aval' and c['text'] != 'Diario Oficial de la Federación'
+                    and c['text'] != 'Sufragio' and c['text'] != 'Escritura'
+                    and c['text'] != 'Documentación' and c['text'] != 'México'):
+                        for ct in conArr:
+                            if (ct.name == c['text']):
+                                repeated = True
+                                break
+                        if (repeated == False):
+                            conArr.append(Concept(float(c['relevance']), c['text'], tx))
+                        else:
+                            ct.av += float(c['relevance'])
+                            ct.text.append(Text(float(c['relevance']), tx))
+                            repeated = False
+        except:
+            print("No concepts found")
+
         repeated=False
+        return catArr, conArr
 
-#        try:
-#            for c in response['concepts']:
-#                if (c['text'] != 'Ley' and c['text'] != 'Sociedad' and c['text'] != 'Acción'
-#                    and c['text'] != 'Estado' and c['text'] != 'General'
-#                    and c['text'] != 'USO' and c['text'] != 'Capital social'
-#                    and c['text'] != 'Documento' and c['text'] != 'Día'
-#                    and c['text'] != 'Ciudadano' and c['text'] != 'Firma electrónica'
-#                    and c['text'] != 'Contrato' and c['text'] != 'Federación'
-#                    and c['text'] != 'Representación' and c['text'] != 'Distrito federal'
-#                    and c['text'] != 'Ciudad de México' and c['text'] != 'Persona jurídica'
-#                    and c['text'] != 'Código civil' and c['text'] != 'Prueba'
-#                    and c['text'] != 'Interés' and c['text'] != 'Persona física'
-#                    and c['text'] != 'Firma digital' and c['text'] != 'El capital'
-#                    and c['text'] != 'Sesenta' and c['text'] != 'Acto jurídico'
-#                    and c['text'] != 'Firma' and c['text'] != 'Ocho'
-#                    and c['text'] != 'Cooperativa' and c['text'] != 'Notario'
-#                    and c['text'] != 'Procedimiento administrativo' and c['text'] != 'Señor'
-#                    and c['text'] != 'Treinta' and c['text'] != 'Mensaje'
-#                    and c['text'] != 'Juicio de amparo' and c['text'] != 'Plural'
-#                    and c['text'] != 'Derecho' and c['text'] != 'Singular'
-#                    and c['text'] != 'Notificación' and c['text'] != 'Agencia Estatal de Administración Tributaria'
-#                    and c['text'] != 'El contrato social' and c['text'] != 'Consejero'
-#                    and c['text'] != 'Verdad' and c['text'] != 'Dividendo'
-#                    and c['text'] != 'Comisario' and c['text'] != 'Ley orgánica'
-#                    and c['text'] != 'Mes' and c['text'] != 'Asamblea'
-#                    and c['text'] != 'Veinte' and c['text'] != 'Vi'
-#                    and c['text'] != 'Iniciativa legislativa popular' and c['text'] != 'Obligación'
-#                    and c['text'] != 'El Caso' and c['text'] != 'Doce'
-#                    and c['text'] != 'Contrato de fianza' and c['text'] != 'Libertad provisional'
-#                    and c['text'] != 'Aval' and c['text'] != 'Diario Oficial de la Federación'
-#                    and c['text'] != 'Sufragio' and c['text'] != 'Escritura'
-#                    and c['text'] != 'Documentación' and c['text'] != 'México'):
-#                        for ct in con:
-#                            if (ct.name == c['text']):
-#                                repeated = True
-#                                break
-#                        if (repeated == False):
-#                            con.append(Concept(float(c['relevance']), c['text'], tx))
-#                        else:
-#                            ct.av += float(c['relevance'])
-#                            ct.text.append(Text(float(c['relevance']), tx))
-#                            repeated = False
-#        except:
-#            print("No concepts found")
-#
-#        repeated = False
-
-#        try:
-#            for e in response['entities']:
-#                for en in ent:
-#                    if (en.name == e['text']):
-#                        repeated = True
-#                        break
-#                if (repeated == False):
-#                    ent.append(Entity(float(e['relevance']), e['text'], e['type']))
-#                else:
-#                    en.av += float(e['relevance'])
-#                    repeated = False
-#        except:
-#            print("No entities found")
-
-#        try:
-#            for k in response['keywords']:
-#                for ke in key:
-#                    if (ke.name == k['text']):
-#                        repeated = True
-#                        break
-#                if (repeated == False):
-#                    key.append(Keyword(float(k['relevance']), k['text']))
-#                else:
-#                    ke.av += float(k['relevance'])
-#                    repeated = False
-#        except:
-#            print("No keywords found")
-
-                #print(len(la))
-
-            #print(tx)
-            #print(json.dumps(response, indent=2))
     except:
         print("Could not read text: ")
         print(tx)
 
-def get_text_from_files(path, look, catRight, catWrong, words, bounds, colors, countW):
+def get_text_from_files(path, catRight, catWrong, words, bounds, colors, countW, imgArr, ia):
     #client = vision.ImageAnnotatorClient()
 
     #bounds = []
@@ -495,6 +432,8 @@ def get_text_from_files(path, look, catRight, catWrong, words, bounds, colors, c
         for block in page.blocks:
             for paragraph in block.paragraphs:
                 paragraph_text = ""
+                wFound = False
+                wArr = []
                 for word in paragraph.words:
                     t = ""
                     paragraph_text = paragraph_text + " "
@@ -505,6 +444,7 @@ def get_text_from_files(path, look, catRight, catWrong, words, bounds, colors, c
                     wi=0
                     for w in words:
                         if (t == w):
+                            wArr.append(t)
                             #print (t + " = " + w)
                             #bounds.append(paragraph.bounding_box)
                             #if (wi < 3):
@@ -517,17 +457,24 @@ def get_text_from_files(path, look, catRight, catWrong, words, bounds, colors, c
                             if (wi < 3):
                                 colors.append("red")
                                 countW[0]+=1
+                                wFound = True
                                 print(t + " = red")
                             elif (wi >= 3 and wi < 6):
                                 colors.append("green")
                                 countW[1]+=1
+                                wFound = True
                                 print(t + " = green")
                             else:
                                 colors.append("blue")
                                 countW[2]+=1
+                                wFound = True
                                 print(t + " = blue")
                         wi+=1
-                #nl_detect(paragraph_text, look, catRight, catWrong);
+                if (wFound):
+                    catsArr, consArr = nl_detect(paragraph_text)
+                    imgArr.append(Acta("http://localhost:5000/static/example"+str(ia)+".jpg",
+                        catsArr, consArr, wArr, paragraph_text))
+                    ia+=1
 
     #for page in texts.pages:
     #    for block in page.blocks:
