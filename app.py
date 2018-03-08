@@ -108,7 +108,8 @@ def upload_file():
     #url='http://bpm.nearshoremx.com/sysNDS/es/neoclassic/cases/cases_ShowDocument?a=9555767175a905da86a5c71075418462&v=1'
     url = request.json.get("url")
     #mainCat = request.json.get("category")
-    wLook = [request.json.get("word1"), request.json.get("word2"), request.json.get("word3")]
+    #wLook = [request.json.get("word1"), request.json.get("word2"), request.json.get("word3")]
+    wLook = request.json.get("word")
     #print (url)
     local_filename = "acta.pdf"
     r = requests.get(url, stream=True)
@@ -140,10 +141,10 @@ def upload_file():
     countW = [0, 0, 0]
     imgArr = []
 
-    for w in wLook:
-        words.append(w)
-        words.append(w.upper())
-        words.append(w.title())
+    #for w in wLook:
+    words.append(wLook)
+    words.append(wLook.upper())
+    words.append(wLook.title())
 
     print (words)
 
