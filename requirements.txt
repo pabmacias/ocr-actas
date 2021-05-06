@@ -7,7 +7,7 @@ click==6.7
 cryptography==2.1.4
 Flask==0.12.2
 Flask-Compress==1.4.0
-Flask-Cors==3.0.3
+Flask-Cors==3.0.9
 google-api-core==0.1.4
 google-api-python-client==1.6.5
 google-auth==1.4.0
